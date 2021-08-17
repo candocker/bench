@@ -1,2 +1,2 @@
 # bench
-The bench module
+The module bench wiki
