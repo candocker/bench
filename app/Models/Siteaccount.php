@@ -7,6 +7,6 @@ namespace ModuleBench\Models;
 class Siteaccount extends AbstractModel
 {
     protected $table = 'siteaccount';
-    //protected $guarded = ['id'];
+    protected $guarded = ['id'];
 
 }

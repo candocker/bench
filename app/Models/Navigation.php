@@ -4,9 +4,9 @@ declare(strict_types = 1);
 
 namespace ModuleBench\Models;
 
-class Toolsort extends AbstractModel
+class Navigation extends AbstractModel
 {
-    protected $table = 'toolsort';
+    protected $table = 'navigation';
     protected $guarded = ['id'];
 
 }

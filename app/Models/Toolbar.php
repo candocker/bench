@@ -7,6 +7,6 @@ namespace ModuleBench\Models;
 class Toolbar extends AbstractModel
 {
     protected $table = 'toolbar';
-    //protected $guarded = ['id'];
+    protected $guarded = ['id'];
 
 }
