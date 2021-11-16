@@ -10,9 +10,22 @@ class Navsort extends AbstractModel
     protected $guarded = ['id'];
     public $timestamps = false;
 
-    public function getCategoryDatas()
+    public function getCategoryDatas($chunkNum = null)
     {
         $datas = $this->where(['parent_code' => '', 'status' => 1])->get()->toArray();
-        return array_chunk($datas, 4, true);
+        return is_null($chunkNum) ? $datas : array_chunk($datas, $chunkNum, true);
+    }
+
+    public function getWebsiteDatas()
+    {
+        $infos = $this->getModelObj('navsortInfo')->where(['navsort_code' => $this->code])->orderBy('orderlist', 'desc')->get();
+        $results = [];
+        foreach ($infos as $info) {
+            $data = $info->toArray();
+            $website = $this->getModelObj('website')->where('id', $info->info_id)->first();
+            $data = array_merge($data, $website->toArray());
+            $results[] = $data;
+        }
+        return $results;
     }
 }
