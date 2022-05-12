@@ -9,10 +9,17 @@ class ToolsortRepository extends AbstractRepository
     protected function _sceneFields()
     {
         return [
-            'list' => ['id', 'name'],
+            'list' => ['name', 'id', 'code', 'parent_code'],
             'listSearch' => ['id', 'name'],
             'add' => ['name'],
             'update' => ['name'],
+        ];
+    }
+
+    public function _getFieldOptions()
+    {
+        return [
+            'name' => ['width' => '200', 'align' => 'left'],
         ];
     }
 

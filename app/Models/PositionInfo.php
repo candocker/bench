@@ -20,6 +20,12 @@ class PositionInfo extends AbstractModel
             $info = $this->getModelObj('navsort')->where(['id' => $this->info_id])->first();
             break;
         }
-        return $info->toArray();
+        $data = $this->toArray();
+        return array_merge($info->toArray(), $data);
+    }
+
+    public function position()
+    {
+        return $this->hasOne(Position::class, 'code', 'position_code');
     }
 }

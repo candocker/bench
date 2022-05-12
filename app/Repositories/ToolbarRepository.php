@@ -9,7 +9,7 @@ class ToolbarRepository extends AbstractRepository
     protected function _sceneFields()
     {
         return [
-            'list' => ['id', 'name'],
+            'list' => ['name', 'id', 'code', 'parent_code'],
             'listSearch' => ['id', 'name'],
             'add' => ['name'],
             'update' => ['name'],

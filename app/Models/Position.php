@@ -10,24 +10,29 @@ class Position extends AbstractModel
     protected $guarded = ['id'];
     public $timestamps = false;
 
-    public function getFocusDatas($sort)
+    public function getMobileListDatas($code)
     {
-        $position = $this->where(['code' => $sort . 'focus'])->first();
+        return $this->getPointDatas($code . 'mobilelist');
+    }
+
+    public function getSortFocusDatas($code)
+    {
+        return $this->getPointDatas($code . 'sortfocus');
+    }
+
+    public function getFocusDatas($code)
+    {
+        return $this->getPointDatas($code . 'focus');
+    }
+
+    public function getPointDatas($code)
+    {
+        $position = $this->where(['code' => $code])->first();
         if (empty($position)) {
             return [];
         }
         $infos = $position->getInfos();
         return $infos;
-    }
-
-    public function getRecommendDatas($sort)
-    {
-        $position = $this->where(['code' => $sort])->first();
-        if (empty($position)) {
-            return ['navDatas' => []];
-        }
-        $infos = $position->getInfos();
-        return ['navDatas' => $infos];
     }
 
     public function getInfos()

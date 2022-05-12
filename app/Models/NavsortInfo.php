@@ -10,4 +10,8 @@ class NavsortInfo extends AbstractModel
     protected $guarded = ['id'];
     public $timestamps = false;
 
+    public function navsort()
+    {
+        return $this->hasOne(Navsort::class, 'code', 'navsort_code');
+    }
 }

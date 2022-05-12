@@ -9,17 +9,25 @@ class NavsortRepository extends AbstractRepository
     protected function _sceneFields()
     {
         return [
-            'list' => ['id', 'name'],
+            'list' => ['name', 'id', 'code', 'parent_code', 'elemNum'],
             'listSearch' => ['id', 'name'],
             'add' => ['name'],
             'update' => ['name'],
         ];
     }
 
+    public function _getFieldOptions()
+    {
+        return [
+            'name' => ['width' => '200', 'align' => 'left'],
+            'elemNum' => ['name' => '网站数量'],
+        ];
+    }
+
     public function getShowFields()
     {
         return [
-            //'type' => ['valueType' => 'key'],
+            //'elemNum' => ['valueType' => 'callback', 'method' => 'getAvatar'],
         ];
     }
 
