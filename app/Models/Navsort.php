@@ -22,13 +22,36 @@ class Navsort extends AbstractModel
         ];
     }
 
-    public function getWebsiteDatas()
+    public function getHomeInfos($chunkNum)
     {
-        $infos = $this->getModelObj('navsortInfo')->where(['navsort_code' => $this->code])->orderBy('orderlist', 'desc')->get();
+        $categorys = $this->where(['parent_code' => ''])->whereIn('status', [1, 10])->get()->keyBy('code');
+        $results = ['categorys' => [], 'mediaCategorys' => []];
+        foreach ($categorys as $category) {
+            $subSorts = $category->getSubElem()->toArray();
+            $subCodes = array_keys($subSorts);
+            $sortInfos = $this->getModelObj('navsortInfo')->whereIn('navsort_code', $subCodes)->orderBy('home_recommend', 'desc')->limit(9)->get();
+            $cData = $category->toArray();
+            $cData['websites'] = $this->getWebsiteDatas($sortInfos);
+            if ($category['status'] == 1) {
+                $results['categorys'][] = $cData;
+            } else {
+                $results['mediaCategorys'][] = $cData;
+            }
+        }
+
+        return [
+            'categorys' => array_chunk($results['categorys'], $chunkNum, true), 
+            'mediaCategorys' => array_chunk($results['mediaCategorys'], $chunkNum, true)
+        ];
+    }
+
+    public function getWebsiteDatas($infos = null)
+    {
+        $infos = is_null($infos) ? $this->getModelObj('navsortInfo')->where(['navsort_code' => $this->code])->orderBy('orderlist', 'desc')->get() : $infos;
         $results = [];
         foreach ($infos as $info) {
             $data = $info->toArray();
-            $website = $this->getModelObj('website')->where('id', $info->info_id)->first();
+            $website = $info->website;
             $data = array_merge($data, $website->toArray());
             $logoPath = $data['logo_path'];
             if (!empty($logoPath)) {

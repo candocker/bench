@@ -14,4 +14,9 @@ class NavsortInfo extends AbstractModel
     {
         return $this->hasOne(Navsort::class, 'code', 'navsort_code');
     }
+
+    public function website()
+    {
+        return $this->hasOne(Website::class, 'id', 'info_id');
+    }
 }

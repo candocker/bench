@@ -28,4 +28,9 @@ class PositionInfo extends AbstractModel
     {
         return $this->hasOne(Position::class, 'code', 'position_code');
     }
+
+    public function website()
+    {
+        return $this->hasOne(Website::class, 'id', 'info_id');
+    }
 }
