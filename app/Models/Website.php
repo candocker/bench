@@ -10,4 +10,8 @@ class Website extends AbstractModel
     protected $guarded = ['id'];
     public $timestamps = false;
 
+    public function getNameFullAttribute()
+    {
+        return "<a href='{$this->url}' target='_blank'>{$this->name}</a>";
+    }
 }

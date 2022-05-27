@@ -9,7 +9,10 @@ class NavsortInfoRequest extends AbstractRequest
     protected function _updateRule()
     {
         return [
-            'id' => ['bail', 'required', 'exists'],
+            //'id' => ['bail', 'required', 'exists'],
+            'navsort_code' => ['bail'],
+            'info_id' => ['bail'],
+            'status' => ['bail'],
         ];
     }
 
@@ -25,5 +28,13 @@ class NavsortInfoRequest extends AbstractRequest
         return [
             //'name.required' => '请填写名称',
         ];
+    }
+
+    public function filterDirtyData($data)
+    {
+        if (isset($data['navsort_code']) && is_array($data['navsort_code'])) {
+            $data['navsort_code'] = array_pop($data['navsort_code']);
+        }
+        return $data;
     }
 }

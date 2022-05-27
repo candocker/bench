@@ -11,6 +11,7 @@ class WebsiteRepository extends AbstractRepository
         return [
             'list' => ['id', 'name'],
             'listSearch' => ['id', 'name'],
+            'keyvalueExtSearch' => ['id', 'name', 'keyword'],
             'add' => ['name'],
             'update' => ['name'],
         ];
