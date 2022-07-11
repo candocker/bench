@@ -29,7 +29,7 @@ class NavsortInfoRepository extends AbstractRepository
     public function getSearchFields()
     {
         return [
-            'navsort_code' => ['showType' => 'cascader', 'valueType' => 'cascader', 'props' => ['value' => 'code', 'label' => 'name', 'children' => 'subInfos', 'checkStrictly' => false, 'multiple' => false], 'infos' => $this->getRepositoryObj('navsort')->getPointTreeDatas('navsort', 2, 'list')],
+            'navsort_code' => ['type' => 'cascader', 'valueType' => 'cascader', 'props' => ['value' => 'code', 'label' => 'name', 'children' => 'subInfos', 'checkStrictly' => false, 'multiple' => false], 'infos' => $this->getRepositoryObj('navsort')->getPointTreeDatas('navsort', 2, 'list')],
             //'type' => ['type' => 'select', 'infos' => $this->getKeyValues('type')],
         ];
     }
