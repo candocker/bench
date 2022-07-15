@@ -40,9 +40,12 @@ class CommonlistRepository extends AbstractRepository
     protected function _statusKeyDatas()
     {
         return [
-            0 => '未激活',
-            1 => '使用中',
-            99 => '锁定',
+            0 => '记录',
+            1 => '采集',
+            2 => '处理',
+			98 => '撤出',
+            99 => '异常',
+			100 => '完成锁定',
         ];
     }
 }

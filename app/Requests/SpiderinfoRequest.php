@@ -18,6 +18,11 @@ class SpiderinfoRequest extends AbstractRequest
         return [
             //'name' => '名称',
         ];
+        return [
+			[['code', 'name', 'site_code', 'url'], 'required'],
+            [['status'], 'default', 'value' => 0],
+            [['sort', 'attachment_db', 'attachment_field', 'info_db', 'info_field', 'info_table'], 'safe'],
+        ];
     }
 
     public function messages(): array
