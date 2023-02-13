@@ -9,7 +9,7 @@ class CommonlistRepository extends AbstractRepository
     protected function _sceneFields()
     {
         return [
-            'list' => ['id', 'name'],
+            'list' => ['id', 'name', 'spiderinfo_id', 'code', 'code_ext', 'spider_num', 'source_site', 'source_url', 'status'],
             'listSearch' => ['id', 'name'],
             'add' => ['name'],
             'update' => ['name'],
@@ -19,7 +19,7 @@ class CommonlistRepository extends AbstractRepository
     public function getShowFields()
     {
         return [
-            //'type' => ['valueType' => 'key'],
+            'source_url' => ['valueType' => 'link', 'showName' => '源URL'],
         ];
     }
 

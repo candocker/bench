@@ -21,19 +21,14 @@ class CommonlistController extends AbstractController
         $where = $action == 'spider' ? ['status' => 0] : ['status' => 1];
         //$where['source_site'] = 'culture';
         //$where['spiderinfo_id'] = 39;
+        //$where['id'] = 5;
         $infos = $model->where($where)->limit(500)->get();
         //echo count($infos);exit();
         $service = $this->getServiceObj('spider');
         foreach ($infos as $info) {
-            $service->spiderinfo = $info->spiderinfo();
-
-            $service->$action();
+            $service->spiderinfo = $info->spiderinfo;
+            $service->$action($info, 'list');
         }
-
-        $repository = $this->getRepositoryObj();
-        $info = $this->getPointInfo($repository, $this->request, false);
-        $service = $this->getServiceObj('spider');
-        $service->spiderinfo = $info;
-		return $this->success($service->spiderinfoOperation($action, $this->request->all()));
+		return $this->success();
     }
 }

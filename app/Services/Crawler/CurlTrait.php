@@ -28,7 +28,10 @@ trait CurlTrait
         if (file_exists($file) && empty($forceDown)) {
             return filesize($file);//true;
         }
-        FileHelper::createDirectory(dirname($file), 0777);
+        $path = dirname($file);
+        if (!is_dir($path)) {
+            mkdir($path, 0777, true);
+        }
 
         $filesize = $this->commandDown($file, $remoteUrl);
         //$filesize = $this->curlDown1($file, $remoteUrl);
@@ -85,7 +88,7 @@ trait CurlTrait
     protected function commandDown($file, $remoteUrl)
     {
         $shell = "wget  -U \"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.79 Safari/537.36\" -O {$file} {$remoteUrl}";
-        echo $shell . "\n";
+        //echo $shell . "\n";
         exec($shell);
 		if (file_exists($file)) {
             return filesize($file);

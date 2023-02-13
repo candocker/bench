@@ -9,8 +9,8 @@ class CommoninfoRepository extends AbstractRepository
     protected function _sceneFields()
     {
         return [
-            'list' => ['id', 'name'],
-            'listSearch' => ['id', 'name'],
+            'list' => ['id', 'spiderinfo_id', 'code', 'code_ext', 'source_site', 'source_url', 'status', 'created_at'],
+            'listSearch' => ['id', 'name', 'spiderinfo_id'],
             'add' => ['name'],
             'update' => ['name'],
         ];
@@ -19,7 +19,7 @@ class CommoninfoRepository extends AbstractRepository
     public function getShowFields()
     {
         return [
-            //'type' => ['valueType' => 'key'],
+            'source_url' => ['valueType' => 'link', 'showName' => '源URL'],
         ];
     }
 

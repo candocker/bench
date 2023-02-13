@@ -10,6 +10,7 @@ trait CrawlerTrait
 	use ShowDealTrait;
 	use ListDealTrait;
 	use SingleDealTrait;
+	use CurlTrait;
 
 	//use \bench\spider\models\crawler\maigoo\MaigooDealTrait;
 	//use \bench\spider\models\crawler\maigoo\MaigooInfoTrait;

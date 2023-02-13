@@ -9,7 +9,7 @@ class SpiderinfoRepository extends AbstractRepository
     protected function _sceneFields()
     {
         return [
-            'list' => ['id', 'name', 'point_operation'],
+            'list' => ['id', 'name', 'code', 'site_code', 'sort', 'url', 'status', 'point_operation'],
             'listSearch' => ['id', 'name'],
             'add' => ['name'],
             'update' => ['name'],
@@ -19,7 +19,7 @@ class SpiderinfoRepository extends AbstractRepository
     public function getShowFields()
     {
         return [
-            //'type' => ['valueType' => 'key'],
+            'sort' => ['valueType' => 'key'],
         ];
     }
 
@@ -108,7 +108,7 @@ class SpiderinfoRepository extends AbstractRepository
         ];
     }
 
-	public function getSortInfos()
+	protected function _sortKeyDatas()
 	{
 		return [
 			'single' => '单页',

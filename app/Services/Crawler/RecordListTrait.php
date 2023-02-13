@@ -9,7 +9,10 @@ trait RecordListTrait
 	protected function _recordGuoxueGuoxue()
 	{
         $datas = [
-            ['page' => 1, 'name' => '诗经', 'code' => 'shijing', 'url' => 'http://www.guoxuemeng.com/guoxue/shijing/'],
+            //['page' => 1, 'name' => '诗经', 'code' => 'shijing', 'url' => 'http://www.guoxuemeng.com/guoxue/shijing/'],
+            ['page' => 1, 'name' => '墨子', 'code' => 'mozi', 'url' => 'http://www.guoxuemeng.com/guoxue/mozi/'],
+            ['page' => 1, 'name' => '荀子', 'code' => 'xunzi', 'url' => 'http://www.guoxuemeng.com/guoxue/xunzi/'],
+            ['page' => 1, 'name' => '古文观止', 'code' => 'guwenguanzhi', 'url' => 'http://www.guoxuemeng.com/guoxue/guwenguanzhi/'],
         ];
 
 		foreach ($datas as $data) {

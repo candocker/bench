@@ -9,6 +9,11 @@ class Commonlist extends AbstractModel
     protected $table = 'commonlist';
     protected $guarded = ['id'];
 
+    public function spiderinfo()
+    {
+        return $this->hasOne(Spiderinfo::class, 'id', 'spiderinfo_id');
+    }
+
     public function createRecord($spiderinfo, $info)
     {
         $where = ['source_site' => $spiderinfo['site_code'], 'spiderinfo_id' => $spiderinfo['id'], 'source_url' => $info['url']];
@@ -45,4 +50,18 @@ class Commonlist extends AbstractModel
 		//echo $file;
 		return $file;
     }
+    
+    /*public function formatSource($view)
+    {
+        $str = "<a href='{$this->source_url}' target='_blank'>{$this->source_url}</a><br />";
+		$file = $this->_getFile();
+        if ($this->fileExist($file)) {
+            $localUrl = $this->getLocalUrl($file);
+            $str .= "<a href='{$localUrl}' target='_blank'>{$localUrl}</a><br />";
+        } else {
+            $str .= '没有本地文件';
+        }
+
+        return $str;
+    }*/
 }

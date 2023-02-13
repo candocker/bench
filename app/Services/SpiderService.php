@@ -38,7 +38,7 @@ class SpiderService extends AbstractService
             return $this->$crawlerMethod($check);
         }
 
-        $pointInfo = $type == 'single' ? $this->spiderinfo : ($type == 'info' ? $params['commoninfo'] : $params['commonlist']);
+        $pointInfo = $type == 'single' ? $this->spiderinfo : $params['info'];
         $crawlerObj = $this->getCrawlerObj($pointInfo->getFile());
         if (empty($crawlerObj) && $type == 'single') {
             $pointInfo->status = 99;
@@ -46,31 +46,48 @@ class SpiderService extends AbstractService
             return false;
         }
 
-        $result = $this->$crawlerMethod($crawlerObj);
-        $datas = $this->$method($crawler, $commonlist);
-        if (empty($datas) || !is_array($datas)) {
+        return $this->$crawlerMethod($crawlerObj, $pointInfo);
+    }
+
+    public function spider($info, $type = '')
+    {
+        $result = $this->_downFile($info->getFile(), $info->source_url);
+        $info->status = !empty($result) ? 1 : 99;
+        $info->save();
+        return true;
+    }
+
+    public function deal($info, $type)
+    {
+        $result = $this->spiderinfoDeal($type, ['info' => $info]);
+        if (empty($result)) {
+			$info->status = 99;
+            $info->save();
             return false;
         }
 
+        if ($type == 'info') {
+            $info->status = $result === true ? 2 : 98;
+		    //$info->save();
+		    return true;
+        }
+
         $spiderNum = $spiderSourcenum = 0;
-        foreach ($datas as $data) {
-            $target = $this->getPointModel('commoninfo')->createRecord($data, $this, $commonlist);
+        foreach ($result as $data) {
+            $target = $this->getModelObj('commoninfo')->createRecord($data, $this->spiderinfo, $info);
 			$spiderSourcenum += 1;
             if (is_object($target)) {
                 $spiderNum += 1;
             }
 
-            $targetId = is_object($target) ? $target['id'] : $target;
-            $this->getPointModel('attachment-bench')->createRecord($data, $this, $targetId);
+            //$targetId = is_object($target) ? $target['id'] : $target;
+            //$this->getPointModel('attachment-bench')->createRecord($data, $this, $targetId);
         }
-        return ['spider_num' => $spiderNum, 'spider_sourcenum' => $spiderSourcenum];
-    }
 
-    public function spider($info)
-    {
-        $result = $this->_downFile($info->getFile(), $info->source_url);
-        $info->status = !empty($result) ? 1 : 99;
-        $info->save();
+    	$info->spider_num = $info->spider_num + $spiderNum;
+    	$info->spider_sourcenum = $info->spider_num + $spiderSourcenum;
+    	$info->status = 2;
+    	$info->save();
         return true;
     }
 
