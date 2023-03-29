@@ -68,7 +68,7 @@ class SpiderService extends AbstractService
 
         if ($type == 'info') {
             $info->status = $result === true ? 2 : 98;
-		    //$info->save();
+		    $info->save();
 		    return true;
         }
 
@@ -128,6 +128,8 @@ class SpiderService extends AbstractService
         if (empty($content)) {
             return false;
         }
+        //$content = str_replace(['<br />', '<br>'], ['</div><div>', '</div><div>'], $content);
+        //echo $content;exit();
         $crawler->addContent($content);
         return $crawler;
     }

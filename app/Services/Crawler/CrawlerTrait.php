@@ -11,6 +11,7 @@ trait CrawlerTrait
 	use ListDealTrait;
 	use SingleDealTrait;
 	use CurlTrait;
+	use \ModuleBench\Services\Crawler\Books\FiveQianDealTrait;
 
 	//use \bench\spider\models\crawler\maigoo\MaigooDealTrait;
 	//use \bench\spider\models\crawler\maigoo\MaigooInfoTrait;

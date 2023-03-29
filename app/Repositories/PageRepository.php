@@ -40,9 +40,17 @@ class PageRepository extends AbstractRepository
     protected function _statusKeyDatas()
     {
         return [
-            0 => '未激活',
-            1 => '使用中',
-            99 => '锁定',
+            0 => '录入',
+            1 => '一次采集',
+            2 => '二次采集',
+        ];
+    }
+
+    protected function _isMobileKeyDatas()
+    {
+        return [
+            0 => '录入',
+            1 => '移动端',
         ];
     }
 }

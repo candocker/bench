@@ -64,14 +64,16 @@ trait ShowDealTrait
         return true;
     }
 
-    protected function _infoGuoxueGuoxue($crawler, $commoninfo)
+    //protected function _infoGuoxueGuoxue($crawler, $commoninfo)
+    protected function _infoGxbaodianGxbaodian($crawler, $commoninfo)
     {
         //print_r($commoninfo->toArray());exit();
         $spiderinfo = $commoninfo->spiderinfoData;
 
         $aDatas = []; 
-		$crawler->filter('.lacontent p')->each(function ($subNode) use (& $aDatas) {
-            $aDatas[] = trim(trim($subNode->text()), '　');
+		//$crawler->filter('.lacontent p')->each(function ($subNode) use (& $aDatas) {
+		$crawler->filter('.contentBox p')->each(function ($subNode) use (& $aDatas) {
+            $aDatas[] = trim($subNode->text());
 		});
         $i = 1;
         $result = [];
@@ -84,14 +86,18 @@ trait ShowDealTrait
             if (in_array($key, ['content'])) {
                 //$key = $index % 2 == 0 ? 'spell' : 'content';
             }
+            //$data = trim($data, '　');
             $result[$key][] = trim($data);
         }
         //print_r($result);exit();
-        $format = [
+        /*$format = [
             'name' => $commoninfo['name'],
             'brief' => '',
             'chapters' => [array_merge(['name' => $commoninfo['name']], $result)],
-        ];
+        ];*/
+        $commoninfo->code_ext = json_encode($result);
+        return true;
+        //print_r($format);exit();
         $content = "<?php\nreturn ".var_export($format,true).';';
         $file = '/data/htmlwww/laravel-system/vendor/candocker/website/migrations/' . $commoninfo['extfield'] . '/' . $commoninfo['code_ext'] . '.php';
 

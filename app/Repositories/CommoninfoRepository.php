@@ -9,8 +9,8 @@ class CommoninfoRepository extends AbstractRepository
     protected function _sceneFields()
     {
         return [
-            'list' => ['id', 'spiderinfo_id', 'code', 'code_ext', 'source_site', 'source_url', 'status', 'created_at'],
-            'listSearch' => ['id', 'name', 'spiderinfo_id'],
+            'list' => ['id', 'spiderinfo_id', 'relate_id', 'code', 'code_ext', 'source_site', 'source_url', 'status', 'created_at'],
+            'listSearch' => ['id', 'name', 'spiderinfo_id', 'relate_id'],
             'add' => ['name'],
             'update' => ['name'],
         ];

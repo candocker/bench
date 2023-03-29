@@ -38,10 +38,12 @@ class Commoninfo extends AbstractModel
         $record = [
             'spiderinfo_id' => $spiderinfo['id'],
             'target_id' => 0,//$target['id'],
-            'code' => $commonlist['code'],
+            'relate_id' => $data['relate_id'] ?? 0,
+            'code' => $data['code'] ?? '',
             'code_ext' => $commonlist['code_ext'] ?? '',
-            'extfield' => $commonlist['extfield'] ?? '',
-            'name' => $commonlist['name'] ?? '',
+            'extfield' => $data['extfield'] ?? '',
+            'name' => $data['name'] ?? '',
+            'title' => $data['title'] ?? '',
             'status' => 0,
             'source_site' => $spiderinfo['site_code'],
             'source_id' => $data['source_id'],
@@ -54,7 +56,11 @@ class Commoninfo extends AbstractModel
 
     public function getFile()
     {
-		$file = "infos/{$this->source_site}/show/{$this->code}/{$this->source_id}.html";
+        if (empty($this->relate_id)) {
+            $file = "infos/{$this->source_site}/show/{$this->code}/{$this->source_id}.html";
+        } else {
+            $file = "infos/{$this->source_site}/show/{$this->relate_id}/{$this->source_id}.html";
+        }
 		return $file;
         //$path = ceil($this->source_id / 1000) - 1;
         //file = "enterprise/{$this->source_site_code}/knowledge/{$path}/{$this->source_id}.html";
