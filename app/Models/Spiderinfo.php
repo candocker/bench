@@ -9,6 +9,11 @@ class Spiderinfo extends AbstractModel
     protected $table = 'spiderinfo';
     protected $guarded = ['id'];
 
+    public function getTargetModel()
+    {
+        return $this->getModelObj($this->info_db . '-' . $this->info_table);
+    }
+
     public function getFile($pointFile = false)
     {
 		if ($this->sort != 'single') {

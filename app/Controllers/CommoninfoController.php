@@ -26,9 +26,9 @@ class CommoninfoController extends AbstractController
         $where = $action == 'spider' ? ['status' => 0] : ['status' => 1];
         //$where['source_site'] = '';
         //$where['spiderinfo_id'] = 4;
-        $where['relate_id'] = 65;
+        //$where['relate_id'] = 65;
         //$where['extfield'] = 65;
-        $infos = $model->where($where)->orderBy('id', 'asc')->limit(500)->get();
+        $infos = $model->where($where)->orderBy('id', 'asc')->limit(300)->get();
         /*foreach ($infos as $info) {
             $sourceUrl = $info->source_url;
             $count = $model->where(['extfield' => 71, 'source_url' => $sourceUrl])->update(['status' => 11]);

@@ -116,4 +116,11 @@ class SpiderinfoRepository extends AbstractRepository
 			'show' => '内容页',
 		];
 	}
+
+    protected function _siteCodeKeyDatas()
+    {
+        return [
+            '5000yan' => '5千言',
+        ];
+    }
 }

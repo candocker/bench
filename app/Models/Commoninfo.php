@@ -14,6 +14,11 @@ class Commoninfo extends AbstractModel
         return $this->hasOne(Spiderinfo::class, 'id', 'spiderinfo_id');
     }
 
+    public function getTargetInfo()
+    {
+        $info = $this->spiderinfo->getTargetModel()->find($this->target_id);
+    }
+
     public function createRecord($data, $spiderinfo, $commonlist)
     {
 		$where = ['spiderinfo_id' => $spiderinfo['id'], 'source_site' => $spiderinfo['site_code'], 'source_id' => $data['source_id'], 'source_url' => $data['source_url']];
