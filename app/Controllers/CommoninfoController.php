@@ -7,10 +7,25 @@ namespace ModuleBench\Controllers;
 class CommoninfoController extends AbstractController
 {
     use DealBookTrait;
+    use OperationTrait;
+    protected $elem = 'info';
 
     public function operation()
     {
         $action = $this->request->input('action');
+        $actions = ['setting', 'spider', 'deal', 'dealBook'];
+        if (!in_array($action, $actions)) {
+            return $this->error('操作不存在');
+        }
+        $mothod = "_{$action}Operation";
+        $model = $this->getModelObj('commoninfo');
+        $datas = $this->$method($model, $this->request->all());
+        return $this->success($datas);
+    }
+
+    protected function _otherOperation($params)
+    {
+
         if ($action == 'dealBook') {
             return $this->dealBookByInfo();
         }
@@ -26,8 +41,7 @@ class CommoninfoController extends AbstractController
         $where = $action == 'spider' ? ['status' => 0] : ['status' => 1];
         //$where['source_site'] = '';
         //$where['spiderinfo_id'] = 4;
-        //$where['relate_id'] = 65;
-        //$where['extfield'] = 65;
+        $where['list_id'] = 25;
         $infos = $model->where($where)->orderBy('id', 'asc')->limit(300)->get();
         /*foreach ($infos as $info) {
             $sourceUrl = $info->source_url;
@@ -48,5 +62,35 @@ class CommoninfoController extends AbstractController
             $service->$action($info, 'info');
         }
 		return $this->success();
+    }
+
+    protected function _dealBookOperation($params)
+    {
+        $commonlistId = 65;
+        $commonlist = $this->getModelObj('commonlist')->where('id', $commonlistId)->first();
+        $bCode = $commonlist['code'];
+        $infos = $this->getModelObj('commoninfo')->where(['relate_id' => $commonlistId])->orderBy('id', 'asc')->get();
+        //$infos = $this->getModelObj('commoninfo')->where(['relate_id' => $commonlistId, 'status' => 2])->where('code_ext', '<>', '[]')->orderBy('id', 'asc')->get();
+        $filePre = config('culture.material_path') . "/books/{$bCode}/";
+        $chapterInfos = [];
+        foreach ($infos as $info) {
+            $chapterInfos[$info['extfield']][] = ['code' => $info['code'], 'name' => $info['name']];
+            if (in_array($info['code'], ['0', '00'])) {
+                continue;
+            }
+            $file = $filePre . $info['code'] . '.php';
+            //$subInfos = $this->getModelObj('commoninfo')->where(['extfield' => $commonlistId, 'status' => 2, 'target_id' => $info['id']])->get();
+            $subInfos = [$info];
+            $str = $this->formatContent($subInfos);
+            //echo $str;exit();
+            if (!is_dir(dirname($file))) {
+                mkdir(dirname($file));
+            }
+            file_put_contents($file, $str);
+        }
+        //print_r($chapterInfos);
+
+        $this->createChapterFile($chapterInfos, $bCode);
+        exit();
     }
 }

@@ -9,7 +9,8 @@ class SpiderinfoRepository extends AbstractRepository
     protected function _sceneFields()
     {
         return [
-            'list' => ['id', 'name', 'code', 'site_code', 'sort', 'url', 'status', 'point_operation'],
+            //'list' => ['id', 'name', 'code', 'url', 'status', 'db_info', 'point_operation'],
+            'list' => ['id', 'name', 'code', 'url', 'status', 'point_operation'],//, 'db_info'
             'listSearch' => ['id', 'name'],
             'add' => ['name'],
             'update' => ['name'],
@@ -19,46 +20,49 @@ class SpiderinfoRepository extends AbstractRepository
     public function getShowFields()
     {
         return [
-            'sort' => ['valueType' => 'key'],
+            //'sort' => ['valueType' => 'key'],
+            'db_info' => ['valueType' => 'callback', 'method' => 'formatDbInfo'],
         ];
     }
+
+    protected function _getTemplatePointFields()
+    {
+        return [
+			'info_db' => ['type' => 'inline', 'formatView' => 'raw', 'method' => 'formatAttr'],
+			//'status' => ['type' => 'changedown'],
+			'listNo' => [
+				'url', 'attachment_db', 'attachment_field', 'info_table', 'info_field',
+			],
+        ];
+    }
+
+	public function formatDbInfo($model)
+	{
+		$str = '';
+		$fields = ['url', 'info_db', 'attachment_db', 'attachment_field', 'info_db', 'info_table', 'info_field'];
+		foreach ($fields as $field) {
+			$value = $field != 'url' ? $model->$field : "<a href='{$model->$field}' target='_blank'>{$model->$field}</a>";
+			$str .= "<b>{$field}</b>: {$value}<br />";
+		}
+		return $str;
+	}
 
     public function getSearchFields()
     {
         return [
-            //'type' => ['type' => 'select', 'infos' => $this->getKeyValues('type')],
+            //'type' => ['type' => 'select'],
         ];
     }
 
     public function getFormFields()
     {
         return [
-            //'type' => ['type' => 'select', 'infos' => $this->getKeyValues('type')],
+            //'type' => ['type' => 'select'],
         ];
     }
 
     protected function _pointOperations($model, $field)
     {
-        if ($model->sort == 'single') {
-            return [
-                [
-                    'name' => '本地URL',
-                    'type' => 'api',
-                    'resource' => 'spiderinfo',
-                    'action' => 'operation',
-                    'app' => $this->getAppcode(),
-                    'params' => ['action' => 'local', 'id' => $model->id],
-                ],
-                [
-                    'name' => '页面处理',
-                    'type' => 'api',
-                    'resource' => 'spiderinfo',
-                    'action' => 'operation',
-                    'app' => $this->getAppcode(),
-                    'params' => ['action' => 'single', 'id' => $model->id],
-                ],
-            ];
-        }
         return [
             /*[
                 'name' => 'URL检测',
@@ -94,6 +98,27 @@ class SpiderinfoRepository extends AbstractRepository
             ],
         ];
 
+        if ($model->sort == 'single') {
+            return [
+                [
+                    'name' => '本地URL',
+                    'type' => 'api',
+                    'resource' => 'spiderinfo',
+                    'action' => 'operation',
+                    'app' => $this->getAppcode(),
+                    'params' => ['action' => 'local', 'id' => $model->id],
+                ],
+                [
+                    'name' => '页面处理',
+                    'type' => 'api',
+                    'resource' => 'spiderinfo',
+                    'action' => 'operation',
+                    'app' => $this->getAppcode(),
+                    'params' => ['action' => 'single', 'id' => $model->id],
+                ],
+            ];
+        }
+
         return $lists;
     }
 
@@ -108,19 +133,10 @@ class SpiderinfoRepository extends AbstractRepository
         ];
     }
 
-	protected function _sortKeyDatas()
-	{
-		return [
-			'single' => '单页',
-			'list' => '列表页',
-			'show' => '内容页',
-		];
-	}
-
-    protected function _siteCodeKeyDatas()
+    public function _getFieldOptions()
     {
         return [
-            '5000yan' => '5千言',
+            'db_info' => ['name' => '目标数据信息', 'width' => '300px'],
         ];
     }
 }

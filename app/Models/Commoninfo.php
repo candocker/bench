@@ -24,8 +24,9 @@ class Commoninfo extends AbstractModel
 		$where = ['spiderinfo_id' => $spiderinfo['id'], 'source_site' => $spiderinfo['site_code'], 'source_id' => $data['source_id'], 'source_url' => $data['source_url']];
         $exist = $this->where($where)->first();
         if (!empty($exist)) {
-            $exist->code_ext = $data['code_ext'] ?? $exist->code_ext;
+            $exist->content = $data['content'] ?? $exist->content;
             $exist->name = $data['name'] ?? $exist->name;
+            $exist->list_id = $data['list_id'] ?? $exist->list_id;
             $exist->extfield = $data['extfield'] ?? $exist->extfield;
             $exist->save();
             return $exist['target_id'];
@@ -43,9 +44,9 @@ class Commoninfo extends AbstractModel
         $record = [
             'spiderinfo_id' => $spiderinfo['id'],
             'target_id' => 0,//$target['id'],
-            'relate_id' => $data['relate_id'] ?? 0,
+            'list_id' => $data['list_id'] ?? 0,
             'code' => $data['code'] ?? '',
-            'code_ext' => $commonlist['code_ext'] ?? '',
+            'content' => $commonlist['content'] ?? '',
             'extfield' => $data['extfield'] ?? '',
             'name' => $data['name'] ?? '',
             'title' => $data['title'] ?? '',

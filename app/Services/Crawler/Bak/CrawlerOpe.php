@@ -26,6 +26,41 @@ trait CrawlerOpe
 		return count($pictures);
     }
 
+    protected function _dealContent($content, $aDatas)
+    {
+        if (empty($content)) {
+            return '';
+        }
+        $replaces = [];
+        foreach ($aDatas as $aData) {
+            $sourceUrl = $aData['source_url_full'] ?? $aData['source_url'];
+			$attachment = $this->_getAttachmentData($aData);
+            $replaces[$sourceUrl] = $attachment->_getFile();
+        }
+		//print_r($replaces);
+        $content = str_replace(array_keys($replaces), array_values($replaces), $content);
+		return $content;
+    }
+
+    protected function _getAttachmentData($aData)
+    {
+		/*$baseField = ['name', 'source_id', 'source_url', 'info_table', 'info_field', 'info_id'];
+		foreach ($baseFields as $bField) {
+			if (isset($aData[$bField])) {
+				return null;
+			}
+		}*/
+        $info = array_merge($aData, [
+            'spiderinfo_id' => $this->id,
+            'source_site' => $this->site_code,
+            'filename' => $aData['name'],
+            'description' => $aData['name'],
+            'created_at' => time(),
+        ]);
+        $attachment = $this->getPointModel('attachment-bench')->addInfoCheck($info, ['info_id', 'info_table', 'info_field', 'source_url']);
+		return $attachment;
+    }
+
     public function getCrawlerElem($node, $dom, $mark, $method = 'attr')
     {
         $elem = $node->filter($dom);

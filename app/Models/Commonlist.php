@@ -46,10 +46,19 @@ class Commonlist extends AbstractModel
 
     public function getFile()
     {
-		$file = "infos/{$this->source_site}/list/{$this->code}/{$this->id}-{$this->source_page}.html";
-		//echo $file;
+        $spiderinfoCode = $this->spiderinfo['code'];
+		$file = "infos/list/{$spiderinfoCode}/{$this->id}-{$this->source_page}.html";
 		return $file;
     }
+
+    /*public function getFile($pointFile = false)
+    {
+		if ($this->sort != 'single') {
+			return '';
+		}
+        $fileName = $pointFile ?: $this->code;
+		return "infos/{$this->site_code}/{$this->sort}/{$fileName}.html";
+    }*/
     
     /*public function formatSource($view)
     {

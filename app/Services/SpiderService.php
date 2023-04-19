@@ -12,43 +12,6 @@ class SpiderService extends AbstractService
 
     public $spiderinfo;
 
-    public function spiderinfoOperation($action, $params)
-    {
-        $action = $this->resource->strOperation($action, 'camel');
-        if ($action == 'local') {
-            $file = $this->spiderinfo->getFile($params['point_file'] ?? false);
-            return ['type' => 'newPage', 'url' => $this->getConfig('uploadUrl', 'domains') . $file];
-        }
-
-        if ($this->spiderinfo->status == 100) {
-            return ['type' => 'common', 'message' => '操作已锁定'];
-        }
-
-        return $this->spiderinfoDeal($action, $params);
-    }
-
-    public function spiderinfoDeal($type, $params)
-    {
-        $siteCode = $this->resource->strOperation($this->spiderinfo->site_code, 'studly');
-        $code =  $this->resource->strOperation($this->spiderinfo->code, 'studly');
-        $crawlerMethod = "_{$type}{$siteCode}{$code}";
-        \Log::debug('spider-method-' . $crawlerMethod);
-        if ($type == 'record') {
-            $check = $this->params['check'] ?? false;
-            return $this->$crawlerMethod($check);
-        }
-
-        $pointInfo = $type == 'single' ? $this->spiderinfo : $params['info'];
-        $crawlerObj = $this->getCrawlerObj($pointInfo->getFile());
-        if (empty($crawlerObj) && $type == 'single') {
-            $pointInfo->status = 99;
-            $pointInfo->save();
-            return false;
-        }
-
-        return $this->$crawlerMethod($crawlerObj, $pointInfo);
-    }
-
     public function spider($info, $type = '')
     {
         $result = $this->_downFile($info->getFile(), $info->source_url);
@@ -59,7 +22,10 @@ class SpiderService extends AbstractService
 
     public function deal($info, $type)
     {
-        $result = $this->spiderinfoDeal($type, ['info' => $info]);
+        $crawlerObj = $this->getCrawlerObj($info->getFile());
+        $method = "_{$type}Deal";
+        $result = empty($crawlerObj) ? false : $this->$method($crawlerObj, $info);
+
         if (empty($result)) {
 			$info->status = 99;
             $info->save();
@@ -89,12 +55,6 @@ class SpiderService extends AbstractService
     	$info->status = 2;
     	$info->save();
         return true;
-    }
-
-    public function fileExist($file)
-    {
-        $file = $this->getPointFile($file);
-        return file_exists($file);
     }
 
     public function getConfig($code, $path = 'bench')
@@ -134,8 +94,35 @@ class SpiderService extends AbstractService
         return $crawler;
     }
 
-    public function getAttachmentMark()
+    /*public function getAttachmentMark()
     {
         return 'spider';
     }
+
+    public function getSiteCodeInfos()
+    {
+        return [
+            'culture' => '文化',
+            'five' => '五千言',
+        ];
+    }
+
+    public function getLocalUrl($file)
+    {
+        return Yii::$app->params['localUrl'] . $file;
+    }
+
+    protected function _getFileUrl($deal = false)
+    {
+        $url = Yii::$app->params['localUrl'];
+        $file = $this->_getFile($deal);
+
+        return $url . $file;
+    }
+
+    public function fileExist($file)
+    {
+        $file = $this->getPointFile($file);
+        return file_exists($file);
+    }*/
 }

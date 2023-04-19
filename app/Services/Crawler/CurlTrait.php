@@ -273,12 +273,4 @@ trait CurlTrait
 
 
     }
-
-    public function getPointFile($file)
-    {
-		if (strpos($file, '/') === 0) {
-			return $file;
-		}
-        return "/data/htmlwww/filesys/" . $file;
-    }
 }

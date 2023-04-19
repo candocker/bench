@@ -9,7 +9,7 @@ class CommonlistRepository extends AbstractRepository
     protected function _sceneFields()
     {
         return [
-            'list' => ['id', 'name', 'spiderinfo_id', 'code', 'code_ext', 'spider_num', 'source_site', 'source_url', 'status'],
+            'list' => ['id', 'name', 'spiderinfo_id', 'code', 'spider_num', 'source_site', 'source_url', 'status'],
             'listSearch' => ['id', 'name'],
             'add' => ['name'],
             'update' => ['name'],
@@ -26,14 +26,14 @@ class CommonlistRepository extends AbstractRepository
     public function getSearchFields()
     {
         return [
-            //'type' => ['type' => 'select', 'infos' => $this->getKeyValues('type')],
+            //'type' => ['type' => 'select'],
         ];
     }
 
     public function getFormFields()
     {
         return [
-            //'type' => ['type' => 'select', 'infos' => $this->getKeyValues('type')],
+            //'type' => ['type' => 'select'],
         ];
     }
 
