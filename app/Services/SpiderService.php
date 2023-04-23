@@ -20,43 +20,6 @@ class SpiderService extends AbstractService
         return true;
     }
 
-    public function deal($info, $type)
-    {
-        $crawlerObj = $this->getCrawlerObj($info->getFile());
-        $method = "_{$type}Deal";
-        $result = empty($crawlerObj) ? false : $this->$method($crawlerObj, $info);
-
-        if (empty($result)) {
-			$info->status = 99;
-            $info->save();
-            return false;
-        }
-
-        if ($type == 'info') {
-            $info->status = $result === true ? 2 : 98;
-		    $info->save();
-		    return true;
-        }
-
-        $spiderNum = $spiderSourcenum = 0;
-        foreach ($result as $data) {
-            $target = $this->getModelObj('commoninfo')->createRecord($data, $this->spiderinfo, $info);
-			$spiderSourcenum += 1;
-            if (is_object($target)) {
-                $spiderNum += 1;
-            }
-
-            //$targetId = is_object($target) ? $target['id'] : $target;
-            //$this->getPointModel('attachment-bench')->createRecord($data, $this, $targetId);
-        }
-
-    	$info->spider_num = $info->spider_num + $spiderNum;
-    	$info->spider_sourcenum = $info->spider_num + $spiderSourcenum;
-    	$info->status = 2;
-    	$info->save();
-        return true;
-    }
-
     public function getConfig($code, $path = 'bench')
     {
         $param = $path ? "app.{$path}.{$code}" : "app.{$code}";

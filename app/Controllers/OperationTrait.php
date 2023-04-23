@@ -22,13 +22,30 @@ trait OperationTrait
     protected function _dealOperation($model, $params)
     {
         $where = ['status' => 1];
-        //$where['list_id'] = 25;
+        //$where['id'] = 1;
         $infos = $model->where($where)->orderBy('id', 'asc')->limit(300)->get();
         $service = $this->getServiceObj('spider');
         $result = [];
         foreach ($infos as $info) {
             $service->spiderinfo = $info->spiderinfo;
-            $service->deal($info, $this->elem);
+            $crawlerObj = $service->getCrawlerObj($info->getFile());
+            if (empty($crawlerObj)) {
+                continue;
+            }
+
+            if ($this->elem == 'list') {
+                $customMethod = $info->getCustomMethod('whole');
+                $method = method_exists($service, $customMethod) ? $customMethod : '_listDeal';
+                $result = $service->$method($crawlerObj, $info);
+                $commonlist = $info;
+            } elseif ($this->elem == 'info') {
+                $customMethod = $info->getCustomMethod('whole');
+                $method = method_exists($service, $customMethod) ? $customMethod : '_infoDeal';
+                $result = $service->$method($crawlerObj, $info);
+            }
+
+            $info->status = empty($result) ? 99 : 2;
+            $info->save();
         }
 		return $this->success();
     }

@@ -9,6 +9,27 @@ class Commonlist extends AbstractModel
     protected $table = 'commonlist';
     protected $guarded = ['id'];
 
+    public function getFilterElem($type)
+    {
+        $filterElems = require(base_path() . '/vendor/candocker/bench/migrations/spiderelems.php');
+        $elems = $filterElems[$this->spiderinfo['code']] ?? [];
+        if (empty($elems)) {
+            return $elems;
+        }
+        $elems = $elems[$this->code] ?? [];
+        if (empty($elems)) {
+            return $elems;
+        }
+        $elems = $elems[$type] ?? [];
+        return $elems;
+    }
+
+    public function getCustomMethod($type)
+    {
+        $method = '_list' . ucfirst($this->spiderinfo['code']) . ucfirst($this->code) . ucfirst($type);
+        return $method;
+    }
+
     public function spiderinfo()
     {
         return $this->hasOne(Spiderinfo::class, 'id', 'spiderinfo_id');

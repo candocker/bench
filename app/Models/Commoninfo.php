@@ -9,6 +9,19 @@ class Commoninfo extends AbstractModel
     protected $table = 'commoninfo';
     protected $guarded = ['id'];
 
+
+    public function getCustomMethod($type)
+    {
+        $commonlist = $this->commonlist;
+        $method = '_info' . ucfirst($this->spiderinfo['code']) . ucfirst($commonlist->code) . ucfirst($type);
+        return $method;
+    }
+
+    public function commonlist()
+    {
+        return $this->hasOne(Commonlist::class, 'id', 'list_id');
+    }
+
     public function spiderinfo()
     {
         return $this->hasOne(Spiderinfo::class, 'id', 'spiderinfo_id');
@@ -19,16 +32,13 @@ class Commoninfo extends AbstractModel
         $info = $this->spiderinfo->getTargetModel()->find($this->target_id);
     }
 
-    public function createRecord($data, $spiderinfo, $commonlist)
+    public function createRecord($data, $spiderinfo)
     {
-		$where = ['spiderinfo_id' => $spiderinfo['id'], 'source_site' => $spiderinfo['site_code'], 'source_id' => $data['source_id'], 'source_url' => $data['source_url']];
+		$where = ['spiderinfo_id' => $spiderinfo['id'], 'source_id' => $data['source_id'], 'source_url' => $data['source_url']];
         $exist = $this->where($where)->first();
         if (!empty($exist)) {
             $exist->content = $data['content'] ?? $exist->content;
-            $exist->name = $data['name'] ?? $exist->name;
-            $exist->list_id = $data['list_id'] ?? $exist->list_id;
-            $exist->extfield = $data['extfield'] ?? $exist->extfield;
-            $exist->save();
+            //$exist->save();
             return $exist['target_id'];
         }
 
@@ -41,35 +51,23 @@ class Commoninfo extends AbstractModel
         }
         $target = $targetModel->addInfo($iData);*/
 
-        $record = [
-            'spiderinfo_id' => $spiderinfo['id'],
-            'target_id' => 0,//$target['id'],
-            'list_id' => $data['list_id'] ?? 0,
-            'code' => $data['code'] ?? '',
-            'content' => $commonlist['content'] ?? '',
-            'extfield' => $data['extfield'] ?? '',
-            'name' => $data['name'] ?? '',
-            'title' => $data['title'] ?? '',
-            'status' => 0,
-            'source_site' => $spiderinfo['site_code'],
-            'source_id' => $data['source_id'],
-            'source_url' => $data['source_url'],
-        ];
-        $this->create($record);
+        $this->create($data);
 		//return $target;
         return true;
     }
 
     public function getFile()
     {
+        $spiderinfoCode = $this->spiderinfo['code'];
+		$file = "infos/show/{$spiderinfoCode}/{$this->id}-{$this->source_id}.html";
+		return $file;
+        //$path = ceil($this->source_id / 1000) - 1;
+        //file = "enterprise/{$this->source_site_code}/knowledge/{$path}/{$this->source_id}.html";
         if (empty($this->relate_id)) {
             $file = "infos/{$this->source_site}/show/{$this->code}/{$this->source_id}.html";
         } else {
             $file = "infos/{$this->source_site}/show/{$this->relate_id}/{$this->source_id}.html";
         }
-		return $file;
-        //$path = ceil($this->source_id / 1000) - 1;
-        //file = "enterprise/{$this->source_site_code}/knowledge/{$path}/{$this->source_id}.html";
     }
 
 

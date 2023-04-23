@@ -6,77 +6,109 @@ namespace ModuleBench\Services\Crawler;
 
 trait CrawlerTrait
 {
-	use CurlTrait;
-	//use RecordListTrait;
-	//use ShowDealTrait;
-	//use ListDealTrait;
-	//use \ModuleBench\Services\Crawler\Books\FiveQianDealTrait;
+    use CurlTrait;
+    //use \ModuleBench\Services\Crawler\Books\FiveQianDealTrait;
 
-	protected function _list5000yan5000yan($crawler, $commonlist)
+    public function _listDeal($crawler, $commonlist, $filterList = null, $commoninfo = null)
     {
-        $tags = $crawler->filter('.listtop div');
-        $desc = [];
-        foreach ($tags as $tag) {
-            $value = trim($tag->nodeValue);
-            if (empty($value)) {
-                continue;
+        $datas = [];
+        $i = 1;
+        $filterList = is_null($commonlist) ? $commonlist->getFilterElem('list') : $filterList;
+        $crawler->filter($filterList['classStr'])->each(function ($node) use ($filterList, $commonlist, $commoninfo, & $i, & $datas) {
+            $record = $filterList['record'] ?? true;
+            $dData = [];
+            $fields = $filterList['fields'] ?? [];
+            foreach ($fields as $field => $domInfo) {
+                $dData[$field] = $field == 'is_middle' ? 1 : $this->getPointValue($node, $domInfo);
             }
-            $desc[] = $value;
-        }
+            if ($record) {
+                $datas[] = $this->formatInfoData($dData, $commonlist, $commoninfo, $i);
+                $i++;
+            }
 
-        //print_r($desc);exit();
-        $commonlist->description = json_encode($desc);
-        $commonlist->save();
-        return false;
-        $sql = 'INSERT INTO `wp_commoninfo` (`spiderinfo_id`, `target_id`, `name`, `code`, `created_at`, `updated_at`, `source_site`, `source_id`, `source_url`) VALUES ';
-        $crawler->filter('.blockGroup article h2')->each(function ($node) use ($sql, $commonlist) {
-            $url = $node->filter('a')->attr('href');
-            $date = date('Y-m-d H:i:s');
-            $name = $node->text();
-            $name = str_replace(['〖翻译〗'], [''], $name);
-            $sourceId = basename($url);
-            $sql .= "(5, '{$commonlist['id']}', '{$name}', '{$commonlist['id']}', '{$date}', '{$date}', '5000yan', '{$sourceId}', '{$url}')";
-            \DB::connection('bench')->select($sql);
+            $subFilter = $filterList['subFilter'] ?? false;
+            if (empty($subFilter)) {
+                return $datas;
+            }
+            $node->filter($subFilter['classStr'])->each(function ($subNode) use ($subFilter, $dData, $commonlist, $commoninfo, & $datas, & $i) {
+                $subData = $dData;
+                $fields = $subFilter['fields'] ?? [];
+                foreach ($fields as $field => $domInfo) {
+                    $subData[$field] = $this->getPointValue($subNode, $domInfo);
+                }
+                $datas[] = $this->formatInfoData($subData, $commonlist, $commoninfo, $i);
+
+                $i++;
+            });
         });
-        return false;
+
+        //print_r($datas);exit();
+        foreach ($datas as $data) {
+            $this->getModelObj('commoninfo')->createRecord($data, $this->spiderinfo);
+        }
+        return $datas;
     }
 
-    //protected function _info5000yan5000yan($crawler, $commoninfo)
-    //protected function _info5000yanChunqiulei($crawler, $commoninfo)
-    protected function _info5000yanFive($crawler, $commoninfo)
+    public function _infoDeal($crawler, $commoninfo)
     {
-        //echo $commoninfo->source_url;
-        //$this->createCommoninfo($crawler, $commoninfo);
-        //exit();
-        //return false;
+        $isMiddle = $commoninfo['is_middle'];
+        if (empty($isMiddle)) {
+            $filterInfo = $commoninfo->commonlist->getFilterElem('info');
+            return $this->_recordInfo($crawler, $commoninfo, $filterInfo);
+        }
 
-        /*$content = '';
-        $spell = '';
-        $pres = $crawler->filter('ruby')->each(function ($node) use (& $content, & $spell, $commoninfo) {
-            $str = trim($node->text());
-            $str2 = trim($node->filter('rt')->text());
-            $str = str_replace($str2, '', $str);
-            $content .= $str;
-            $spell .= $str2 . (in_array($str, ['，', '。']) ? $str : ' ');
-            
-        });
-        $spell = str_replace([' ，', ' 。'], ['，', '。'], $spell);*/
+        $filterElem = $commoninfo->commonlist->getFilterElem('middle');
+        if (isset($filterElem['info'])) {
+            $this->_recordInfo($crawler, $commoninfo, $filterElem['info']);
+        }
+        return $this->_listDeal($crawler, $commoninfo->commonlist, $filterElem['list'], $commoninfo);
+    }
 
-        $sStr = $crawler->filter('.section-body .grap')->html();
-        $sStr = strip_tags($sStr);
-        $infos = explode("\n", $sStr);
-        //print_r($infos);
+    protected function _recordInfo($crawler, $commoninfo, $filterInfo)
+    {
+        $classStr = $filterInfo['classStr'];
+        $fields = $filterInfo['fields'] ?? [];
+        $node = $crawler->filter($classStr);
+        foreach ($fields as $field => $domInfo) {
+            $method = $domInfo['method'] ?? false;
+            $commoninfo->$field = $method ? $this->$method($node) : $this->getPointVaie($node, $domInfo);
+        }
+        $commoninfo->save();
+        return true;
+        
+    }
 
-        $images = [];
-        /*$crawler->filter('.grap img')->each(function ($node) use (& $images) {
-            $iUrl = $node->attr('data-wuqianyan');
-            $images[] = '<img src="' . $iUrl . '" />';
-        });*/
+    public function formatInfoData($data, $commonlist, $commoninfo, $i)
+    {
+        $sourceId = basename($data['source_url']);
+        $data['source_id'] = str_replace('.html', '', $sourceId);
+        $data['name'] = str_replace(['大戴礼记·', '尔雅·'], ['', ''], $data['name']);
+        $data['code'] = $i;
+        $data['list_id'] = $commonlist['id'];
+        $data['info_id'] = $commoninfo ? $commoninfo['id'] : 0;
+        $data['spiderinfo_id'] = $commonlist['spiderinfo_id'];
+        return $data;
+    }
 
-        $elems = $crawler->filter('.section-body .grap')->children();
-        //$elems = $crawler->filter('.section-body .grap div');
-        $datas = [];//'content' => [$content], 'spell' => [$spell]];
-        $key = 'content';
+    public function getPointValue($node, $domInfo)
+    {
+        $dom = $domInfo['dom'] ?? false;
+        $method = $domInfo['method'] ?? 'text';
+        $node = $dom ? $node->filter($dom) : $node;
+
+        if ($method == 'attr') {
+            $mark = $domInfo['mark'];
+            return trim($node->$method($mark));
+        }
+        if (in_array($method, ['text', 'html'])) {
+            return trim($node->$method());
+        }
+    }
+
+    protected function formatContent($node, $key = 'content')
+    {
+        $elems = $node->children();
+        $datas = [];
         $keys = [
             '【原文】' => 'content', 
             '【原文】' => 'content',
@@ -91,10 +123,8 @@ trait CrawlerTrait
         ];
         $olds = ['〔', '〕', '[', ']', '（', '）', '①','②','③','④','⑤','⑥','⑦','⑧','⑨','⑩','⑪','⑫','⑬','⑭', '⑮', '⑯', '⑰', '⑱', '⑲', '⑳', '㉑', '㉒', '㉓', '㉔', '㉕', '㉖'];
         $news = ['(', ')', '(', ')', '(', ')', '(1)','(2)','(3)','(4)','(5)', '(6)', '(7)', '(8)', '(9)', '(10)', '(11)', '(12)', '(13)', '(14)', '(15)', '(16)', '(17)', '(18)', '(19)', '(20)', '(21)', '(22)', '(23)', '(24)', '(25)', '(26)'];
-        //foreach ($elems as $elem) {
-            //$value = trim($elem->nodeValue);
-        foreach ($infos as $value) {
-            $value = trim(str_replace([' '], [''], $value));
+        foreach ($elems as $elem) {
+            $value = trim($elem->nodeValue);
             if (empty($value)) {
                 continue;
             }
@@ -109,75 +139,7 @@ trait CrawlerTrait
                 $key = 'vernacular';
             }
         }
-        $datas['vernacular'] = isset($datas['vernacular']) ? array_merge($datas['vernacular'], $images) : $images;
-        //print_r($datas);exit();
-        $commoninfo->code_ext = json_encode($datas);
-        $commoninfo->save();
-        return true;
-    }
-
-	//protected function _listGuoxueGuoxue($crawler, $commonlist)
-	//protected function _listGxbaodianGxbaodian($crawler, $commonlist)
-	protected function _list5000yanFive($crawler, $commonlist)
-    {
-        //print_r($commonlist->toArray());
-		$datas = [];
-        $i = 1;
-        $selectStr = '.gxllist4 li'; // guoxue
-        $selectStr = '.lunyu_section li'; // gxbaodian
-        $selectStr = '.section-body ul li'; // file 1
-        $selectStr = '.main-content ul li'; // file 2
-        //$selectStr = '.main-content-shouye p';
-        //$selectStr = '.main-content .qianziwen a';
-        $crawler->filter($selectStr)->each(function ($node) use (& $datas, $commonlist, & $i) {
-            $baseObj = $node->filter('a');
-            $sourceUrl = $baseObj->attr('href');
-
-            $sourceId = basename($sourceUrl);
-			$sourceId = str_replace('.html', '', $sourceId);
-            $name = $baseObj->text();
-            $name = str_replace(['大戴礼记·', '尔雅·'], ['', ''], $name);
-			$datas[] = [
-				'source_url' => $sourceUrl,
-				'name' => $name,
-				'code' => $i,
-				'name' => $name,
-                'list_id' => $commonlist['id'],
-                //'code_ext' => $name,
-				'source_id' => $sourceId,
-			];
-            $i++;
-		});
-
-        //$selectStr = '.main-content article'; // file 2
-        $selectStr = '.main-content-shouye div'; // file 2
-        $crawler->filter($selectStr)->each(function ($node) use (& $datas, $commonlist, & $i) {
-            //$chapter = trim($node->filter('h2')->text());
-            $chapter = '';//trim($node->filter('.menu-item-object-category p')->text());
-            $description = '';//trim($node->filterXPath('//div[contains(@class,"shi-jianju")]')->text());
-
-            $node->filter('a')->each(function ($subNode) use ($chapter, $description, & $datas, $commonlist, & $i) {
-                $sourceUrl = $subNode->attr('href');
-    
-                $sourceId = basename($sourceUrl);
-    			$sourceId = str_replace('.html', '', $sourceId);
-                $name = $subNode->text();
-                $name = str_replace(['大戴礼记·', '尔雅·'], ['', ''], $name);
-    			$datas[] = [
-    				'source_url' => $sourceUrl,
-    				'name' => $name,
-    				'code' => $i,
-    				'name' => $name,
-                    'list_id' => $commonlist['id'],
-                    'extfield' => $chapter,
-                    'title' => $description,
-    				'source_id' => $sourceId,
-    			];
-                $i++;
-		    });
-		});
-
-        //print_r($datas);exit();
-		return $datas;
+        print_r($datas);exit();
+        return json_encode($datas);
     }
 }

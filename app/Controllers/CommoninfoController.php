@@ -8,6 +8,7 @@ class CommoninfoController extends AbstractController
 {
     use DealBookTrait;
     use OperationTrait;
+
     protected $elem = 'info';
 
     public function operation()
@@ -17,7 +18,7 @@ class CommoninfoController extends AbstractController
         if (!in_array($action, $actions)) {
             return $this->error('操作不存在');
         }
-        $mothod = "_{$action}Operation";
+        $method = "_{$action}Operation";
         $model = $this->getModelObj('commoninfo');
         $datas = $this->$method($model, $this->request->all());
         return $this->success($datas);
