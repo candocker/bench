@@ -14,7 +14,7 @@ return [
     'middle' => [
         'info' => [
             'classStr' => '.main-content .listtop',
-            'fields' => ['content' => ['method' => 'formatContent']],
+            'fields' => ['content' => ['method' => 'formatContent', 'pointKey' => 'vernacular']],
         ],
         'list' => [
             'classStr' => '.main-content article h2 a',

@@ -6,39 +6,6 @@ namespace ModuleBench\Controllers;
 
 trait DealBookTrait
 {
-    public function createChapterFile($chapters, $code)
-    {
-        $ccFile = config('culture.material_path') . "/booklist/{$code}.php";
-        $cFile = config('culture.material_path') . "/booklist/{$code}_catalogue.php";
-        //print_r($chapters);exit();
-        $cStr = $ccStr = "<?php\nreturn [\n";
-        $ccStr .= "'chapters' => [\n";
-        foreach ($chapters as $code => $elems) {
-            $ccStr .= "[\n";
-            $ccStr .= "    'name' => '{$code}',\n";
-            $ccStr .= "    'brief' => '',\n";
-            $ccStr .= "    'infos' => [\n";
-            $infoStr = '';
-            foreach ($elems as $elem) {
-                $infoStr .= "'{$elem['code']}', ";
-                $cStr .= "    '{$elem['code']}' => ['code' => '{$elem['code']}', 'name' => '{$elem['name']}', 'brief' => '',],\n";
-            }
-            $infoStr = trim($infoStr, ', ');
-            $ccStr .= "        {$infoStr}\n";
-            $ccStr .= "    ],\n";
-            $ccStr .= "],\n";
-        }
-        $ccStr .= "],\n";
-
-        $ccStr .= "];";
-        $cStr .= "];";
-        echo $cStr;
-        echo $ccStr;
-        file_put_contents($ccFile, $ccStr);
-        file_put_contents($cFile, $cStr);
-        exit();
-    }
-
     /*public function dealBookByList($commonlist)
     {
         $code = $commonlist->code;
@@ -72,55 +39,6 @@ trait DealBookTrait
         $str = $this->formatContent($infos);
         file_put_contents($file, $str);
     }*/
-
-    public function formatContent($infos, $extInfo = null)
-    {
-        $str = "<?php\nreturn [\n";
-        $str .= "'chapters' => [\n";
-
-        foreach ($infos as $info) {
-            $codeExt = $info->code_ext;
-            $datas = json_decode($codeExt, true);
-
-            //print_r($datas);exit();
-            /*$newDatas = [];
-            foreach ($datas['content'] as $i => $elem) {
-                $newDatas[$i]['content'][] = $elem;
-                if (isset($datas['vernacular'][$i])) {
-                    $newDatas[$i]['vernacular'][] = $datas['vernacular'][$i];
-                }
-            }
-            //print_r($newDatas);exit();
-            foreach ($newDatas as $datas) {*/
-
-            $str .= "[\n";
-            $space = '    ';
-            $str .= $this->getPointStr($datas, $space);
-            $str .= "],\n";
-            //}
-        }
-        $str .= "],\n";
-
-        if (!empty($extInfo)) {
-            $str .= $getPointStr($extInfo, '');
-        }
-
-        $str .= "];";
-        return $str;
-    }
-
-    protected function getPointStr($datas, $space)
-    {
-        $str = '';
-        foreach ($datas as $key => $subValue) {
-            $str .= "{$space}'{$key}' => [\n";
-            foreach ($subValue as $value) {
-                $str .= "{$space}    '{$value}',\n";
-            }
-            $str .= "{$space}],\n";
-        }
-        return $str;
-    }
 
     public function adjust()
     {

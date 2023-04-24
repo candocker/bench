@@ -13,7 +13,7 @@ trait CrawlerTrait
     {
         $datas = [];
         $i = 1;
-        $filterList = is_null($commonlist) ? $commonlist->getFilterElem('list') : $filterList;
+        $filterList = is_null($filterList) ? $commonlist->getFilterElem('list') : $filterList;
         $crawler->filter($filterList['classStr'])->each(function ($node) use ($filterList, $commonlist, $commoninfo, & $i, & $datas) {
             $record = $filterList['record'] ?? true;
             $dData = [];
@@ -71,7 +71,8 @@ trait CrawlerTrait
         $node = $crawler->filter($classStr);
         foreach ($fields as $field => $domInfo) {
             $method = $domInfo['method'] ?? false;
-            $commoninfo->$field = $method ? $this->$method($node) : $this->getPointVaie($node, $domInfo);
+            $pointKey = $domInfo['pointKey'] ?? 'content';
+            $commoninfo->$field = $method ? $this->$method($node, $pointKey) : $this->getPointVaie($node, $domInfo);
         }
         $commoninfo->save();
         return true;
@@ -125,6 +126,7 @@ trait CrawlerTrait
         $news = ['(', ')', '(', ')', '(', ')', '(1)','(2)','(3)','(4)','(5)', '(6)', '(7)', '(8)', '(9)', '(10)', '(11)', '(12)', '(13)', '(14)', '(15)', '(16)', '(17)', '(18)', '(19)', '(20)', '(21)', '(22)', '(23)', '(24)', '(25)', '(26)'];
         foreach ($elems as $elem) {
             $value = trim($elem->nodeValue);
+            $value = str_replace([' '], [''], $value);
             if (empty($value)) {
                 continue;
             }
@@ -139,7 +141,7 @@ trait CrawlerTrait
                 $key = 'vernacular';
             }
         }
-        print_r($datas);exit();
+        //print_r($datas);exit();
         return json_encode($datas);
     }
 }

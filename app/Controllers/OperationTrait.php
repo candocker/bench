@@ -50,20 +50,6 @@ trait OperationTrait
 		return $this->success();
     }
 
-    protected function _deepDealOperation()
-    {
-        $where = ['status' => 1];
-        //$where['spiderinfo_id'] = 39;
-        $infos = $model->where($where)->limit(500)->get();
-        //echo count($infos);exit();
-        $service = $this->getServiceObj('spider');
-        foreach ($infos as $info) {
-            $service->spiderinfo = $info->spiderinfo;
-            $service->$action($info, $this->elem);
-        }
-		return $this->success();
-    }
-
     protected function _settingOperation($model, $params)
     {
         $elem = $this->request->input('elem');
