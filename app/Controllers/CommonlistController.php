@@ -21,25 +21,25 @@ class CommonlistController extends AbstractController
 
         $method = "_{$action}Operation";
         $model = $this->getModelObj('commonlist');
-        $datas = $this->$method($model, $this->request->all());
+        $datas = $this->$method($model, $this->request->all(), ['id' => 12]);
         return $this->success($datas);
     }
 
-    protected function _dealBookOperation()
+    protected function _dealBookOperation($model, $params, $where = null)
     {
-        $commonlistId = 1;
-        $commonlist = $this->getModelObj('commonlist')->where('id', $commonlistId)->first();
+        $where = is_null($where) ? ['id' => 1] : $where;
+        $commonlist = $this->getModelObj('commonlist')->where($where)->first();
         $bCode = $commonlist['code'];
-        $infos = $this->getModelObj('commoninfo')->where(['info_id' => 0, 'list_id' => $commonlistId])->orderBy('id', 'asc')->get();
-        //$this->createChapterFile($infos, $bCode); exit();
+        $infos = $this->getModelObj('commoninfo')->where(['info_id' => 0, 'list_id' => $commonlist['id']])->orderBy('id', 'asc')->get();
+        $this->createChapterFile($infos, $bCode);
 
         $filePre = config('culture.material_path') . "/books/{$bCode}/";
-        if (!is_dir(dirname($filePre))) {
-            mkdir(dirname($filePre));
+        if (!is_dir($filePre)) {
+            mkdir($filePre);
         }
         foreach ($infos as $info) {
             if (in_array($info['code'], ['0', '00'])) {
-                continue;
+                //continue;
             }
 
             $file = $filePre . $info['code'] . '.php';
@@ -60,23 +60,33 @@ class CommonlistController extends AbstractController
     public function createChapterFile($infos, $code)
     {
         $chapters = [];
+        $briefDatas = [];
         foreach ($infos as $info) {
-            $chapters[$info['sort']][] = ['code' => $info['code'], 'name' => $info['name']];
+            if (empty($info['sort'])) {
+                $key = $info->commonlist->name;
+                $chapters[$key][] = ['code' => $info['code'], 'name' => $info['name'], 'brief' => $info['description']];
+            } else {
+                $key = $info['sort'];
+                $chapters[$key][] = ['code' => $info['code'], 'name' => $info['name'], 'brief' => $info['description']];
+                $briefDatas[$key] = $info['description'];
+            }
         }
+        //print_r($chapters);exit();
 
         $chapterFile = config('culture.material_path') . "/booklist/{$code}.php";
         $catalogueFile = config('culture.material_path') . "/booklist/{$code}_catalogue.php";
         $catalogueStr = $chapterStr = "<?php\nreturn [\n";
         $chapterStr .= "'chapters' => [\n";
         foreach ($chapters as $code => $elems) {
+            $brief = $briefDatas[$code] ?? '';
             $chapterStr .= "[\n";
             $chapterStr .= "    'name' => '{$code}',\n";
-            $chapterStr .= "    'brief' => '',\n";
+            $chapterStr .= "    'brief' => '{$brief}',\n";
             $chapterStr .= "    'infos' => [\n";
             $infoStr = '';
             foreach ($elems as $elem) {
                 $infoStr .= "'{$elem['code']}', ";
-                $catalogueStr .= "    '{$elem['code']}' => ['code' => '{$elem['code']}', 'name' => '{$elem['name']}', 'brief' => '',],\n";
+                $catalogueStr .= "    '{$elem['code']}' => ['code' => '{$elem['code']}', 'name' => '{$elem['name']}', 'brief' => '{$elem['brief']}',],\n";
             }
             $infoStr = trim($infoStr, ', ');
             $chapterStr .= "        {$infoStr}\n";
@@ -87,8 +97,8 @@ class CommonlistController extends AbstractController
 
         $chapterStr .= "];";
         $catalogueStr .= "];";
-        echo $catalogueStr;
-        echo $chapterStr;
+        //echo $catalogueStr;
+        //echo $chapterStr;
         file_put_contents($chapterFile, $chapterStr);
         file_put_contents($catalogueFile, $catalogueStr);
         return true;
@@ -102,7 +112,7 @@ class CommonlistController extends AbstractController
         foreach ($infos as $info) {
             $content = $info->content;
             $datas = json_decode($content, true);
-            //print_r($datas);exit();
+            //print_r($datas);
             $str .= "[\n";
             $space = '    ';
             $str .= $this->getPointStr($datas, $space);
@@ -121,7 +131,7 @@ class CommonlistController extends AbstractController
     protected function getPointStr($datas, $space)
     {
         $str = '';
-        foreach ($datas as $key => $subValue) {
+        foreach ((array) $datas as $key => $subValue) {
             $str .= "{$space}'{$key}' => [\n";
             foreach ($subValue as $value) {
                 $str .= "{$space}    '{$value}',\n";

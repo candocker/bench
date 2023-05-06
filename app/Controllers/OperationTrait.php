@@ -19,10 +19,9 @@ trait OperationTrait
         return [];
     }
 
-    protected function _dealOperation($model, $params)
+    protected function _dealOperation($model, $params, $where = null)
     {
-        $where = ['status' => 1];
-        //$where['id'] = 1;
+        $where = $where ?? ['status' => 1];
         $infos = $model->where($where)->orderBy('id', 'asc')->limit(300)->get();
         $service = $this->getServiceObj('spider');
         $result = [];
@@ -32,6 +31,9 @@ trait OperationTrait
             if (empty($crawlerObj)) {
                 continue;
             }
+            /*if ($info->id >= 3409 && $info->id <= 3414) {
+                continue;
+            }*/
 
             if ($this->elem == 'list') {
                 $customMethod = $info->getCustomMethod('whole');
