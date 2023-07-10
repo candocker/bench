@@ -19,7 +19,8 @@ trait CrawlerTrait
         //$filterList = is_null($filterList) ? $commonlist->getFilterElem('list') : $filterList;
         $filterList = is_null($filterList) ? $this->getPointElem($commonlist, 'list') : $filterList;
         //print_r($filterList);exit();
-        $crawler->filter($filterList['classStr'])->each(function ($node) use ($filterList, $commonlist, $commoninfo, & $i, & $datas) {
+        $extData = [];
+        $crawler->filter($filterList['classStr'])->each(function ($node) use ($filterList, $commonlist, $commoninfo, & $i, & $datas, & $extData) {
             //$record = $filterList['record'] ?? true;
             $dData = [];
             $fields = $filterList['fields'] ?? [];
@@ -29,19 +30,29 @@ trait CrawlerTrait
 
             $subFilter = $filterList['subFilter'] ?? false;
             if (empty($subFilter)) {
-                $datas[] = $this->formatInfoData($dData, $commonlist, $commoninfo, $i);
-                $i++;
+                //$extData['sort'] = $i < 31 ? '孔门弟子' : '相关重要人物';
+                //if (in_array($dData['name'], ['经学流派', '认识儒学'])) {
+                if (false) {//in_array($dData['name'], ['修身', '齐家b', '治国', '纲常伦理', '礼法b', '哲学', '其他思想'])) {
+                    $extData['sort'] = $dData['name'];
+                } else {
+                    $datas[] = array_merge($extData, $this->formatInfoData($dData, $commonlist, $commoninfo, $i));
+                    $i++;
+                }
                 return $datas;
             }
-            $node->filter($subFilter['classStr'])->each(function ($subNode) use ($subFilter, $dData, $commonlist, $commoninfo, & $datas, & $i) {
+            $node->filter($subFilter['classStr'])->each(function ($subNode) use ($subFilter, & $dData, $commonlist, $commoninfo, & $datas, & $i) {
                 $subData = $dData;
                 $fields = $subFilter['fields'] ?? [];
                 foreach ($fields as $field => $domInfo) {
                     $subData[$field] = $this->getPointValue($subNode, $domInfo);
                 }
-                $datas[] = $this->formatInfoData($subData, $commonlist, $commoninfo, $i);
+                if (false) {//in_array($subData['name'], ['总论', '名家', '著作'])) {
+                    $dData['sub_sort'] = $subData['name'];
+                } else {
+                    $datas[] = $this->formatInfoData($subData, $commonlist, $commoninfo, $i);
+                    $i++;
+                }
 
-                $i++;
             });
         });
 
@@ -86,8 +97,8 @@ trait CrawlerTrait
             $node = $this->formatNode($node, $domInfo);
             
             //$sStr = $crawler->filter('.main-content .shi-zhong')->html();//zhuangzhi sanzijing
-            $sStr = $crawler->filter('.main-content h2')->html();//zhuangzhi sanzijing
-            //$sStr = '';
+            //$sStr = $crawler->filter('.main-content h2')->html();//zhuangzhi sanzijing
+            $sStr = '';
             $commoninfo->$field = $method ? $this->$method($node, $pointKey, $sStr) : $this->getPointValue($node, $domInfo);
         }
         $check = request()->input('check');
@@ -138,7 +149,13 @@ trait CrawlerTrait
 
     protected function formatContent($node, $key = 'content', $sStr = '')
     {
+        $images = [];
+        $node->filter('img')->each(function ($node) use (& $images) {
+            $iUrl = $node->attr('data-wuqianyan');
+            $images[] = '<img src="' . $iUrl . '" />';
+        });
         $sStr .= $node->html();
+
         $sStr = strip_tags($sStr);
         $elems = explode("\n", $sStr);
         $datas = [];
@@ -186,10 +203,18 @@ trait CrawlerTrait
             }
             $datas[$key][] = $value;
         }
+        if (!empty($images)) {
+            $datas['images'] = $images;
+        }
         $check = request()->input('check');
         if ($check) {
             print_r($datas);exit();
         }
         return json_encode($datas);
     }
+
+    /*public function _listFiveKongzizhuanWhole($crawler, $commonlist, $filterList = null, $commoninfo = null)
+    {
+        print_r($commonlist->toArray());exit();
+    }*/
 }

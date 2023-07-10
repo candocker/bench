@@ -58,6 +58,8 @@ trait FiveTrait
             5 => ['sort' => ['dom' => 'h2']],
             6 => ['content' => ['method' => 'formatContent', 'dom' => 'div', 'index' => 0, 'pointKey' => 'unscramble']],
             7 => ['description' => ['dom' => '.post--keywords']],
+            8 => ['sort' => ['dom' => 'article .block-title']],
+            9 => ['content' => ['method' => 'formatContent', 'dom' => '.liebiao-dingbu', 'pointKey' => 'unscramble']],
         ];
     }
 
@@ -75,6 +77,9 @@ trait FiveTrait
             9 => '.shi-jianju a',
             10 => '.main-content article div a',
             11 => '.layoutSingleColumn .paiban li a',
+            95 => '.shi-jianju a',
+            96 => '.price-info li a',
+            97 => '.shi-jianju li a',
             98 => '.main-content a',
             99 => 'a',
         ];
@@ -83,6 +88,16 @@ trait FiveTrait
     public function _fiveElems()
     {
         return [
+            'daodejingdianping' => ['list' => [8, 4], 'info' => [1, 1]],
+            'yijingrumen' => ['list' => [8, 4], 'info' => [1, 1]],
+            'yijingcihui' => ['list' => [8, 4], 'info' => [1, 1]],
+            'lunyurenwu' => ['list' => [5, 4], 'info' => [1, 1]],
+            'ruxuesixiang' => ['list' => [10, 4], 'info' => [1, 1]],
+            'ruxuejianjie' => ['list' => [10, 4], 'info' => [1, 1]],
+            'ruxue' => ['list' => [7, 8], 'subFilter' => [95, 4], 'info' => [1, 1]],
+            'kongzizhuan' => ['list' => [11, 4], 'info' => [1, 1]],
+            'yijing2' => ['list' => [7, 5], 'subFilter' => [96, 4], 'info' => [1, 1]],
+            'shanhaijing' => ['list' => [7, 8], 'subFilter' => [97, 4], 'middle' => [[8, 4], [3, 9]], 'info' => [1, 1]],
             'sanzijing2' => ['list' => [98, 4], 'info' => [1, 1]],
             'qianziwen2' => ['list' => [98, 4], 'info' => [1, 1]],
             'chuci2' => ['list' => [8, 4], 'middle' => [[8, 4], [3, 6]], 'info' => [1, 1]],

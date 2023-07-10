@@ -21,7 +21,9 @@ class CommonlistController extends AbstractController
 
         $method = "_{$action}Operation";
         $model = $this->getModelObj('commonlist');
-        $datas = $this->$method($model, $this->request->all(), ['id' => 12]);
+        $pointId = $this->request->input('point_id');
+        $where = $pointId ? ['id' => $pointId] : null;
+        $datas = $this->$method($model, $this->request->all(), $where);
         return $this->success($datas);
     }
 
@@ -134,7 +136,11 @@ class CommonlistController extends AbstractController
         foreach ((array) $datas as $key => $subValue) {
             $str .= "{$space}'{$key}' => [\n";
             foreach ($subValue as $value) {
-                $str .= "{$space}    '{$value}',\n";
+                if (strpos($value, '图一') !== false || strpos($value, '图三') !== false) {
+                    $str .= "{$space}    //'{$value}',\n";
+                } else {
+                    $str .= "{$space}    '{$value}',\n";
+                }
             }
             $str .= "{$space}],\n";
         }

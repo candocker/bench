@@ -19,7 +19,9 @@ class CommoninfoController extends AbstractController
         }
         $method = "_{$action}Operation";
         $model = $this->getModelObj('commoninfo');
-        $datas = $this->$method($model, $this->request->all());
+        $pointId = $this->request->input('point_id');
+        $where = $pointId ? ['list_id' => $pointId] : null;
+        $datas = $this->$method($model, $this->request->all(), $where);
         return $this->success($datas);
     }
 }
