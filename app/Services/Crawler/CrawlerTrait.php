@@ -8,7 +8,8 @@ use Swoolecan\Foundation\Helpers\CommonTool;
 
 trait CrawlerTrait
 {
-    use CurlTrait;
+    //use CurlTrait;
+    use PointTrait;
     use FiveTrait;
     //use \ModuleBench\Services\Crawler\Books\FiveQianDealTrait;
 

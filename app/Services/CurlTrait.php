@@ -1,6 +1,6 @@
 <?php
 
-namespace ModuleBench\Services\Crawler;
+namespace ModuleBench\Services;
 
 //use yii\helpers\FileHelper;
 use GuzzleHttp\Client;

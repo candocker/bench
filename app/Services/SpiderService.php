@@ -20,17 +20,6 @@ class SpiderService extends AbstractService
         return true;
     }
 
-    public function getConfig($code, $path = 'bench')
-    {
-        $param = $path ? "app.{$path}.{$code}" : "app.{$code}";
-        return config($param);
-    }
-
-    public function getPointFile($file)
-    {
-        return $this->getConfig('spiderPath', 'bench') . $file;
-    }
-
     public function getContent($file)
     {
         $file = $this->getPointFile($file);
